@@ -2,6 +2,7 @@ package mesh;
 
 import java.util.ArrayList;
 import java.util.List;
+import mesh.vec3d;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -12,29 +13,37 @@ import java.util.List;
  *
  * @author alexp
  */
-public class Vertex {
-    public int id;
-    public float x,y,z;
+
+// Class defining a generic vector with 3 components. Can be a direction, a coordinate or anything else
+
+
+public class Vertex extends vec3d{
+    private int id;
     private List<Integer> connE = new ArrayList<>();
     private List<Face> partOfF = new ArrayList<>();
     
     public Vertex(int id, float x, float y, float z)
     {
+        super(x,y,z);
         this.id = id;
-        this.x = x;
-        this.y = y;
-        this.z = z;
     }
+
+    public int getID(){
+        return this.id;
+    }
+
     public void addVconn(int v)
     {
         if(!(connE.contains(v)))
             connE.add(v);
     }
+
     public void addFconn(Face f)
     {
         if(!(partOfF.contains(f)))
             partOfF.add(f);
     }
+
     public List<Face> combineF(Vertex v1, Vertex v2){
         List<Face> fcomb = v1.partOfF;
         for(Face f : v2.partOfF){

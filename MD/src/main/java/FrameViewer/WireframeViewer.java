@@ -17,6 +17,8 @@ import javax.swing.Timer;
  *
  * @author alexp
  */
+
+
 public class WireframeViewer extends JPanel{
     List<Vertex> vertices = new ArrayList<>();
     List<Face> faces = new ArrayList<>();
@@ -104,9 +106,9 @@ public class WireframeViewer extends JPanel{
             int [][] points = new int[3][2];
             
             for (int i=0; i<3; i++){
-                double x = v[i].x;
-                double y = v[i].y;
-                double z = v[i].z;
+                double x = v[i].getX();
+                double y = v[i].getY();
+                double z = v[i].getZ();
                 
                 double xRot = x*  Math.cos(angle) - z *Math.sin(angle);
                 double zRot = x* Math.sin(angle) - z*Math.cos(angle);

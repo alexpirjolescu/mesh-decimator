@@ -4,11 +4,13 @@
  */
 package simplify;
 
+import mesh.vec4d;
+
 /**
  *
  * @author alexp
  */
-public class Quadric {
+public class Quadric{
     double[][] Q = new double[4][4];
 
     public void add(Quadric other) {
@@ -17,8 +19,8 @@ public class Quadric {
                 this.Q[i][j] += other.Q[i][j];
     }
 
-    public static Quadric fromPlane(double a, double b, double c, double d) {
-        double[] p = {a, b, c, d};
+    public static Quadric fromPlane(vec4d plane) {
+        double[] p = {plane.getX(), plane.getY(), plane.getZ(), plane.getA()};
         Quadric q = new Quadric();
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)

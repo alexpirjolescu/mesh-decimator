@@ -11,16 +11,14 @@ import mesh.*;
  *
  * @author alexp
  */
+
 public class QEMUtils {
     
-    
-        //map vertex to quadric
+    //map vertex to quadric
     private Map<Integer, Quadric> vertexQ = new HashMap<>();
     //private GFG minHEdgeCost = new GFG(1000);
     private record edges(int v1, int v2){}
     public Map<edges, Quadric> edgeQ = new HashMap<>();
-
-    
     
     public QEMUtils(Mesh mesh){
         for (Face face : mesh.getFaces()){
@@ -28,12 +26,12 @@ public class QEMUtils {
             Vertex v2 = mesh.getV(face.getV2());
             Vertex v3 = mesh.getV(face.getV3());
             
-            double[] plane = computePlane(v1,v2,v3);
-            Quadric faceQ = Quadric.fromPlane(plane[0], plane[1], plane[2], plane[3]);
+            vec4d plane = computePlane(v1,v2,v3);
+            Quadric faceQ = Quadric.fromPlane(plane);
             
-            vertexQ.computeIfAbsent(v1.id, id -> new Quadric()).add(faceQ);
-            vertexQ.computeIfAbsent(v2.id, id -> new Quadric()).add(faceQ);
-            vertexQ.computeIfAbsent(v3.id, id -> new Quadric()).add(faceQ);
+            vertexQ.computeIfAbsent(v1.getID(), id -> new Quadric()).add(faceQ);
+            vertexQ.computeIfAbsent(v2.getID(), id -> new Quadric()).add(faceQ);
+            vertexQ.computeIfAbsent(v3.getID(), id -> new Quadric()).add(faceQ);
         }
         
         for (Face face : mesh.getFaces()){
@@ -63,26 +61,17 @@ public class QEMUtils {
     
     
     
-    private double[] computePlane(Vertex v1, Vertex v2, Vertex v3) {
-        // Compute normal
-        float[] u = {v2.x - v1.x, v2.y - v1.y, v2.z - v1.z};
-        float[] v = {v3.x - v1.x, v3.y - v1.y, v3.z - v1.z};
+    private vec4d computePlane(Vertex v1, Vertex v2, Vertex v3) {
 
-        double a = u[1]*v[2] - u[2]*v[1];
-        double b = u[2]*v[0] - u[0]*v[2];
-        double c = u[0]*v[1] - u[1]*v[0];
+        vec3d u = v2.minus(v1);
+        vec3d v = v3.minus(v1);
 
-        // Normalize
-        double length = Math.sqrt(a*a + b*b + c*c);
-        if (length == 0) return new double[] {0, 0, 0, 0};
+        vec3d component = u.cross(v);
+        component = component.getNormalized();
 
-        a /= length;
-        b /= length;
-        c /= length;
+        double a = -component.dot(v1);
 
-        // Compute d from point on plane
-        double d = -(a*v1.x + b*v1.y + c*v1.z);
-        return new double[] {a, b, c, d};
+        return new vec4d(component, a);
     }
     
     

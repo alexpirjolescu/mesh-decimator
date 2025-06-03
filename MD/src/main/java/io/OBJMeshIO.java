@@ -62,7 +62,7 @@ public class OBJMeshIO implements MeshIO {
     public void save(Mesh mesh, File file) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
             for (Vertex v : mesh.getVertices()) {
-                writer.printf("v %.6f %.6f %.6f%n", v.x, v.y, v.z);
+                writer.printf("v %.6f %.6f %.6f%n", v.getX(), v.getY(), v.getZ());
             }
             for (Face f : mesh.getFaces()) {
                 // Note: OBJ uses 1-based indexing
