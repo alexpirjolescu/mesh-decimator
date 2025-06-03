@@ -3,9 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package simplify;
-import java.util.*;
-import mesh.*;
-import simplify.*;
+//import java.util.*;
+//import mesh.*;
+//import simplify.*;
 /**
  *
  * @author alexp

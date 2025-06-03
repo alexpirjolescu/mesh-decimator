@@ -10,9 +10,6 @@ import mesh.Mesh;
 import io.OBJMeshIO;
 import FrameViewer.*;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
 
 /**
  *

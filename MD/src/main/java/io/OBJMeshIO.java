@@ -4,7 +4,6 @@
  */
 package io;
 import java.io.*;
-import java.util.*;
 import mesh.*;
 /**
  *
@@ -37,10 +36,14 @@ public class OBJMeshIO implements MeshIO {
                         mesh.addVertex(new Vertex(mesh.getVListSize(), x, y, z)); // Add vertex with extracted x/y/z to the mesh object
                     } else if (line.startsWith("f ")) { // If the line is identified as a face
                         String[] parts = line.split("\\s+"); // Split the string line into components
-                        int v1 = parseIndex(parts[1]); // Grab first vertex id
-                        int v2 = parseIndex(parts[2]); // Grab second vertex id
-                        int v3 = parseIndex(parts[3]); // Grab third vertex id
-                        mesh.addFace(new Face(v1, v2, v3)); // Add face to the mesh object with extracted vertex ids
+                        int[] vals = new int[parts.length-1]; // allocate space for the vertex IDs
+                        for(int i=0; i<vals.length; i++){ // parse all vertex IDs
+                            vals[i] = parseIndex(parts[i+1]);
+                        }
+                        int anchor = vals[0]; // use first vertex as the anchor
+                        for(int i=0; i<vals.length-2; i++){ // for all vertex pairs that dont include the anchor
+                            mesh.addFace(new Face(anchor, vals[i+1], vals[i+2])); //Add triangular face using anchor and the next pair
+                        }
                     }
                 }
             } catch(Exception e) { 

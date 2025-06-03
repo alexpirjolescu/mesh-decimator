@@ -14,8 +14,8 @@ public class Mesh {
     private List<Face> faces = new ArrayList<>();
     private List<Edge> edges = new ArrayList<>();
 
-    private record edges(int v1, int v2){}
-    private Map <edges, Integer> edgesMap = new HashMap<>();
+    //private record edges(int v1, int v2){}
+    //private Map <edges, Integer> edgesMap = new HashMap<>();
     
     public List<Vertex> getVertices()
     {

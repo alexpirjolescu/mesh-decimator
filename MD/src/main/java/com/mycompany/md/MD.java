@@ -7,7 +7,6 @@ package com.mycompany.md;
 import FrameViewer.WireframeViewer;
 import io.OBJMeshIO;
 import java.io.File;
-import java.net.URISyntaxException;
 import java.net.URL;
 import javax.swing.JFrame;
 import mesh.Mesh;

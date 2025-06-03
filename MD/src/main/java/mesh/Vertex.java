@@ -2,7 +2,6 @@ package mesh;
 
 import java.util.ArrayList;
 import java.util.List;
-import mesh.vec3d;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
