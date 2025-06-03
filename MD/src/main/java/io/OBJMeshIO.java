@@ -11,38 +11,46 @@ import mesh.*;
  * @author alexp
  */
 
+ // General interface for 3D model loading & saving
 interface MeshIO {
-        Mesh load(File file) throws IOException;
-        void save (Mesh mesh, File file) throws IOException;
+        Mesh load(File file) throws IOException, FileNotFoundException; // Function for loading the file
+        void save (Mesh mesh, File file) throws IOException, FileNotFoundException; // Function for saving a file
  }
 
 public class OBJMeshIO implements MeshIO {
 
     @Override
-    public Mesh load(File file) throws IOException {
-        Mesh mesh = new Mesh();
+    public Mesh load(File file) throws IOException, FileNotFoundException {
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-                if (line.startsWith("v ")) {
-                    String[] parts = line.split("\\s+");
-                    float x = Float.parseFloat(parts[1]);
-                    float y = Float.parseFloat(parts[2]);
-                    float z = Float.parseFloat(parts[3]);
-                    mesh.addVertex(new Vertex(mesh.getVListSize(), x, y, z));
-                } else if (line.startsWith("f ")) {
-                    String[] parts = line.split("\\s+");
-                    int v1 = parseIndex(parts[1]);
-                    int v2 = parseIndex(parts[2]);
-                    int v3 = parseIndex(parts[3]);
-                    mesh.addFace(new Face(v1, v2, v3));
+        Mesh mesh = new Mesh(); // Creates a new mesh object
+
+        if(file.isFile()){
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) { // Creates reader for obj file
+                String line;
+                while ((line = reader.readLine()) != null) { // While the next line isnt null
+                    line = line.trim(); // Strip the line
+                    if (line.startsWith("v ")) { // If the line is identified as a vertex
+                        String[] parts = line.split("\\s+"); // Split the string line into components
+                        float x = Float.parseFloat(parts[1]); // Grab x
+                        float y = Float.parseFloat(parts[2]); // Grab y
+                        float z = Float.parseFloat(parts[3]); // Grab z
+                        mesh.addVertex(new Vertex(mesh.getVListSize(), x, y, z)); // Add vertex with extracted x/y/z to the mesh object
+                    } else if (line.startsWith("f ")) { // If the line is identified as a face
+                        String[] parts = line.split("\\s+"); // Split the string line into components
+                        int v1 = parseIndex(parts[1]); // Grab first vertex id
+                        int v2 = parseIndex(parts[2]); // Grab second vertex id
+                        int v3 = parseIndex(parts[3]); // Grab third vertex id
+                        mesh.addFace(new Face(v1, v2, v3)); // Add face to the mesh object with extracted vertex ids
+                    }
                 }
+            } catch(Exception e) { 
+                throw new IOException("Failed to read from provided file."); // If something goes wrong with reading the file but the file exists throws IOException
             }
+        } else {
+            throw new FileNotFoundException("File does not exist or is a directory."); // If the provided file doesn't exist or just isnt a file throws FileNotFoundException
         }
 
-        return mesh;
+        return mesh; // Returns the constructed mesh
     }
 
     private int parseIndex(String part) {
@@ -60,6 +68,8 @@ public class OBJMeshIO implements MeshIO {
                 // Note: OBJ uses 1-based indexing
                 writer.printf("f %d %d %d%n", f.getV1() + 1, f.getV2() + 1, f.getV3() + 1);
             }
+        } catch(Exception e){
+            throw new IOException("Failed to write to file.");
         }
     }
     
