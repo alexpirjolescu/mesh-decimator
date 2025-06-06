@@ -1,11 +1,16 @@
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\com\mycompany\md\MD.java
+C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\FrameViewer\ButtonConfig.java
+C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\FrameViewer\LayeredFrame.java
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\FrameViewer\WireframeViewer.java
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\io\OBJMeshIO.java
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\io\STLMeshIO.java
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\mesh\Edge.java
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\mesh\Face.java
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\mesh\Mesh.java
+C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\mesh\vec3d.java
+C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\mesh\vec4d.java
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\mesh\Vertex.java
+C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\simplify\EdgeCollapse.java
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\simplify\GFG.java
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\simplify\MeshSimplifier.java
 C:\Users\alexp\Desktop\TUe\Q4\SoftwareDesign\git_MD\MD\src\main\java\simplify\QEMUtils.java

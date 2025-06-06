@@ -4,7 +4,6 @@ mesh\Mesh.class
 io\MeshIO.class
 mesh\Edge.class
 simplify\MeshSimplifier.class
-mesh\Mesh$edges.class
 simplify\QEMUtils.class
 simplify\GFG.class
 com\mycompany\md\MD.class

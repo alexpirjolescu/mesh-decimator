@@ -4,13 +4,12 @@
 
 package com.mycompany.md;
 
-import FrameViewer.WireframeViewer;
 import io.OBJMeshIO;
 import java.io.File;
 import java.net.URL;
 import javax.swing.JFrame;
 import mesh.Mesh;
-
+import FrameViewer.*;
 /**
  *
  * @author alexp
@@ -30,7 +29,7 @@ public class MD {
         JFrame frame = new JFrame("Wireframe Viewer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800,600);
-        frame.add(new WireframeViewer(mesh));
+        frame.add(new LayeredFrame(mesh, frame));
         frame.setVisible(true);
     }
 }
