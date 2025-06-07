@@ -42,7 +42,7 @@ public class OBJMeshIO implements MeshIO {
                         }
                         int anchor = vals[0]; // use first vertex as the anchor
                         for(int i=0; i<vals.length-2; i++){ // for all vertex pairs that dont include the anchor
-                            mesh.addFace(new Face(anchor, vals[i+1], vals[i+2])); //Add triangular face using anchor and the next pair
+                            mesh.addFace(new Face(mesh.sizeFList(), anchor, vals[i+1], vals[i+2])); //Add triangular face using anchor and the next pair
                         }
                     }
                 }

@@ -10,16 +10,23 @@ package simplify;
  *
  * @author alexp
  */
+
+import java.util.Comparator;
+import java.util.PriorityQueue;
+import java.util.concurrent.PriorityBlockingQueue;
+
 public class MeshSimplifier {
     // minheap of collapse cost 
-    // solve optimal position (Quadric method)
+        // should be a PriotityQueue<EdgeCollapse> using cost as primary key
+    private PriorityQueue<EdgeCollapse> heap = new PriorityQueue<>(Comparator.comparingDouble(e-> e.cost));
+    // add version to each vertex and increment version of new vertex created 
+    // find collapse position 
     // create new vertex with optimal position
-    //call this on the combined list of faces of v1 and v2
-        // update faces that are connected to v1 or v2 
-            // add updateFaces() method
-        // remove degenerate faces (faces where 2 indices are the same)
+    // create edge and face of which new vertex is part of 
+            // remove degenerate faces (faces where 2 indices are the same)
             //add isDegenerate() method
-        // remove old vertices (v1 and v2)
+
+        // remove old vertices (v1 and v2) from the 
     // insert the new vertex and add conncetions (edge and face)
     // update edge collapse candidate list 
     

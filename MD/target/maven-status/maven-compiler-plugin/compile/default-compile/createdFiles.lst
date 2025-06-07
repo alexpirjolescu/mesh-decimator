@@ -5,9 +5,7 @@ io\MeshIO.class
 mesh\Edge.class
 simplify\MeshSimplifier.class
 simplify\QEMUtils.class
-simplify\GFG.class
 com\mycompany\md\MD.class
-simplify\QEMUtils$edges.class
 FrameViewer\WireframeViewer$1.class
 io\OBJMeshIO.class
 mesh\Vertex.class

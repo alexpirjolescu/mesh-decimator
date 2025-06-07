@@ -1,5 +1,7 @@
 package mesh;
 
+import java.util.Arrays;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
@@ -11,14 +13,20 @@ package mesh;
  */
 public class Face {
     private int v1, v2, v3;
+    private boolean valid = true;
+    private int id;
     
-    public Face(int v1, int v2, int v3)
+    public Face(int id, int v1, int v2, int v3)
     {
+        this.id = id;
         this.v1 = v1;
         this.v2 = v2;
         this.v3 = v3;
     }
-    
+    public int getId(){
+        return id;
+    }
+
     public int getV1()
     {
         return this.v1;
@@ -31,11 +39,28 @@ public class Face {
     {
         return this.v3;
     }
-    public boolean isDegenerate(Face f){
-        if(f.getV1() == f.getV2() || f.getV2() == f.getV3() ||f.getV1() == f.getV3())
-            return true;
-        else
-            return false;
+
+    public int[] getVertices() {
+        int[] vert = new int[] {v1, v2, v3};
+        return vert;
     }
-    
+    public boolean isDegenerate(){
+        return (v1 == v2 || v2==v3 || v1==v3);
+    }
+
+    public void replaceVertex(int oldV, int newV) { 
+        if (v1 == oldV) v1 = newV;
+        if (v2 == oldV) v2 = newV;
+        if (v3 == oldV) v3 = newV;
+    }
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean status) {
+        valid = status;
+    }
+
 }
+    

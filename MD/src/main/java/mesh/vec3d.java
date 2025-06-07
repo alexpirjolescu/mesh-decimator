@@ -35,6 +35,10 @@ public class vec3d {
         return new vec3d(this.x/value, this.y/value, this.z/value);
     }
 
+    public static vec3d midpoint(vec3d a, vec3d b) {
+        return new vec3d((a.x + b.x) * 0.5, (a.y + b.y) * 0.5, (a.z + b.z) * 0.5);
+    }
+
     public double dot(vec3d other) throws NullPointerException{
         if(other==null){
             throw new NullPointerException();

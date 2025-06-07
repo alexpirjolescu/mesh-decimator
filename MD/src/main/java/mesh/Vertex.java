@@ -18,19 +18,36 @@ import java.util.List;
 
 public class Vertex extends vec3d{
     private int id;
-    private List<Integer> connE = new ArrayList<>();
-    private List<Face> partOfF = new ArrayList<>();
+    private int version;
+    private boolean alive = true;
     
-    public Vertex(int id, float x, float y, float z)
+    public Vertex(int id, double x, double y, double z)
     {
         super(x,y,z);
         this.id = id;
+        this.version = 0;
     }
 
     public int getID(){
         return this.id;
     }
 
+    public boolean isAlive() {
+        return alive;
+    }
+
+    public int getVersion() {
+        return this.version;
+    }
+
+    public void setAlive(boolean status) {
+        this.alive = status;
+    }
+
+    public void incrementVersion(){
+        this.version++;
+    }
+/* 
     public void addVconn(int v)
     {
         if(!(connE.contains(v)))
@@ -44,13 +61,15 @@ public class Vertex extends vec3d{
     }
 
     public List<Face> combineF(Vertex v1, Vertex v2){
-        List<Face> fcomb = v1.partOfF;
+        List<Face> fcomb = new ArrayList<>(v1.partOfF);
         for(Face f : v2.partOfF){
             if(!(fcomb.contains(f)))
                 fcomb.add(f);
         }
         return fcomb;
     }
+
+    //after edge collapse, combine the edge list of the 2 vertices 
     public List<Integer> combineE(Vertex v1,Vertex v2){
         List<Integer> ecomb = v1.connE;
         for(Integer i : v2.connE){
@@ -62,5 +81,5 @@ public class Vertex extends vec3d{
         return ecomb;
     }
         
-    
+  */  
 }

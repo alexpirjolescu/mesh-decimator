@@ -12,10 +12,11 @@ import java.util.Objects;
  */
 public class Edge {
     public int v1, v2;
+    public int id;
     
-    
-    public Edge(int v1, int v2)
+    public Edge(int id, int v1, int v2)
     {
+        this.id = id; 
         this.v1 = v1;
         this.v2 = v2;
     

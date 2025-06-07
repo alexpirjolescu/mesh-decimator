@@ -4,6 +4,7 @@
  */
 package simplify;
 
+import mesh.vec3d;
 import mesh.vec4d;
 
 /**
@@ -13,10 +14,31 @@ import mesh.vec4d;
 public class Quadric{
     double[][] Q = new double[4][4];
 
+    public Quadric() {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                Q[i][j] = 0.0;
+            }
+        }
+    }
+
+    public Quadric(Quadric other) {
+        this.Q = new double[4][4];
+        for (int i = 0; i < 4; i++) {
+            System.arraycopy(other.Q[i], 0, this.Q[i], 0, 4);
+        }
+    }
+
     public void add(Quadric other) {
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
                 this.Q[i][j] += other.Q[i][j];
+    }
+
+    public void subtract(Quadric other) {
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                this.Q[i][j] -= other.Q[i][j];
     }
 
     public static Quadric fromPlane(vec4d plane) {
@@ -53,7 +75,11 @@ public class Quadric{
             return fallbackPosition;
         }
         
-        return solveLinearSystem(A, b);
+        double[] x = solveLinearSystem(A, b);
+        if (x == null) {
+            return fallbackPosition;
+        }
+        return x;
     }
     
     private double[] solveLinearSystem(double[][] A, double[] b)
@@ -83,6 +109,9 @@ public class Quadric{
         }
         double[] x = new double[n];
         for(int i =n-1; i>=0; i--){
+            if (Math.abs(A[i][i])<1e-14) {
+                return null;
+            }    
             x[i] = b[i];
             for (int j=i+1; j<n; j++)
                 x[i]-= A[i][j]*x[j];
@@ -94,9 +123,22 @@ public class Quadric{
     }
     private double determinant3x3(double[][] m)
     {
-        return m[0][0] * (m[1][0] * m[2][2] - m[1][2]*m[2][1])
+        return m[0][0] * (m[1][1] * m[2][2] - m[1][2]*m[2][1])
              - m[0][1] * (m[1][0] * m[2][2] - m[1][2]*m[2][0])
              + m[0][2] * (m[1][0] * m[2][1] - m[1][1]*m[2][0]);
+    }
+
+    public double evaluate(vec3d v) {
+        double[] vec = {v.getX(), v.getY(), v.getZ(), 1.0};
+        double sum = 0.0;
+        for (int i = 0; i < 4; i++) {
+            double rowSum = 0.0;
+            for (int j = 0; j < 4; j++) {
+                rowSum += Q[i][j] * vec[j];
+            }
+            sum += vec[i] * rowSum;
+        }
+        return sum;
     }
     
 }

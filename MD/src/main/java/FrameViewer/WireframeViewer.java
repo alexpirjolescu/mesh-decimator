@@ -96,33 +96,35 @@ public class WireframeViewer extends JPanel{
         
         //For each face draw lines between the 3 vertecies that define it
         for (Face face : faces) {
-            Vertex[] v ={
-                vertices.get(face.getV1()),
-                vertices.get(face.getV2()),
-                vertices.get(face.getV3())
-            };
-            
-            int [][] points = new int[3][2];
-            
-            for (int i=0; i<3; i++){
-                double x = v[i].getX();
-                double y = v[i].getY();
-                double z = v[i].getZ();
+            if (face.isValid()){
+                Vertex[] v ={
+                    vertices.get(face.getV1()),
+                    vertices.get(face.getV2()),
+                    vertices.get(face.getV3())
+                };
                 
-                double xRot = x*  Math.cos(angle) - z *Math.sin(angle);
-                double zRot = x* Math.sin(angle) - z*Math.cos(angle);
-            
-                double scale = 24000 / (zRot+400);        //Perspective projection
-                int screenX = (int) (w / 2 + xRot * scale);
-                int screenY = (int) (h /2 - y * scale);
-                points[i][0] = screenX;
-                points[i][1] = screenY;
+                int [][] points = new int[3][2];
+                
+                for (int i=0; i<3; i++){
+                    double x = v[i].getX();
+                    double y = v[i].getY();
+                    double z = v[i].getZ();
+                    
+                    double xRot = x*  Math.cos(angle) - z *Math.sin(angle);
+                    double zRot = x* Math.sin(angle) - z*Math.cos(angle);
+                
+                    double scale = 24000 / (zRot+400);        //Perspective projection
+                    int screenX = (int) (w / 2 + xRot * scale);
+                    int screenY = (int) (h /2 - y * scale);
+                    points[i][0] = screenX;
+                    points[i][1] = screenY;
+                }
+                for (int i=0; i<3; i++){
+                    int j = (i+1)%3;
+                    g2d.drawLine(points[i][0], points[i][1], points[j][0], points[j][1]);
+                }
+                
             }
-            for (int i=0; i<3; i++){
-                int j = (i+1)%3;
-                g2d.drawLine(points[i][0], points[i][1], points[j][0], points[j][1]);
-            }
-            
         }
     }
     

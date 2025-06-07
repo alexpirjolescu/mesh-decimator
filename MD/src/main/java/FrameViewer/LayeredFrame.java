@@ -11,6 +11,7 @@ import java.awt.*;
 import java.io.File;
 
 import mesh.Mesh;
+import simplify.QEMUtils;
 /**
  *
  * @author alexp
@@ -23,6 +24,8 @@ public class LayeredFrame extends JLayeredPane {
         private JButton loadButton;
         // export button
         private JButton exportButton;
+        //decimate button 
+        private JButton decimateButton;
         // slider
         private JSlider slider;
         // mesh frame
@@ -30,13 +33,16 @@ public class LayeredFrame extends JLayeredPane {
         // mesh
         private Mesh mesh;
 
+        private QEMUtils qem;
+
 
     public LayeredFrame(Mesh mesh, JFrame frame){
         setLayout(null);
         setPreferredSize(new Dimension(800, 600));
         this.frame = frame;
         this.mesh = mesh;
-        meshPanel = new WireframeViewer(mesh);
+        this.qem = new QEMUtils(this.mesh);
+        meshPanel = new WireframeViewer(qem.mesh);
         add(meshPanel, Integer.valueOf(0));
     
         loadButton = new JButton("Load");
@@ -45,6 +51,13 @@ public class LayeredFrame extends JLayeredPane {
         exportButton = new JButton("Export");
         exportButton.addActionListener(e -> exportOBJ());
         add(exportButton, Integer.valueOf(2));
+
+        decimateButton = new JButton("Decimate");
+        decimateButton.addActionListener(e ->{ 
+            System.out.println("Decimate button pressed!"); 
+            decimate1010Async();
+        });
+        add(decimateButton, Integer.valueOf(1));
 
         slider = new JSlider(0,100,50);
         add(slider,Integer.valueOf(1));
@@ -66,6 +79,7 @@ public class LayeredFrame extends JLayeredPane {
             //Export button 15% width 5% height
             exportButton.setBounds((int)(width*0.15), (int)(height*0.05), btnWidth, btnHeight);
 
+            decimateButton.setBounds((int)(width*0.80), (int)(height *0.05), 2*btnWidth, btnHeight);
             //Slider at 5% width 90% height
             int sliderWidth = (int)(width * 0.25);
             int sliderHeight = 40;
@@ -73,6 +87,15 @@ public class LayeredFrame extends JLayeredPane {
 
         }
 
+    private void decimate100(){
+        int i = 0;
+        while(i < 100) {
+            qem.decimateOneStep();
+            i++;
+            meshPanel.repaint();
+        }
+        
+    }
 
     private void exportOBJ() {
         JFileChooser chooser = new JFileChooser();
@@ -89,5 +112,43 @@ public class LayeredFrame extends JLayeredPane {
             }
         } 
     }
+
+    private void decimate100Async() {
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                for (int i = 0; i < 100; i++) {
+                    qem.decimateOneStep();
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                // Runs on EDT after doInBackground finishes
+                meshPanel.repaint();
+            }
+        };
+        worker.execute();  // Starts the background thread
+}
+    
+    private void decimate1010Async() {
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                for (int i = 0; i < 1010; i++) {
+                    qem.decimateOneStep();
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                // Runs on EDT after doInBackground finishes
+                meshPanel.repaint();
+            }
+        };
+        worker.execute();  // Starts the background thread
+}
 }
 
