@@ -63,13 +63,14 @@ public class OBJMeshIO implements MeshIO {
 
     @Override
     public void save(Mesh mesh, File file) throws IOException {
+        exportMesh eMesh = new exportMesh(mesh);
         try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
-            for (Vertex v : mesh.getVertices()) {
+            for (Vertex v : eMesh.mesh.getVertices()) {
                 if (v.getVersion() == 0){
                     writer.printf("v %.6f %.6f %.6f%n", v.getX(), v.getY(), v.getZ());
                 }
             }
-            for (Face f : mesh.getFaces()) {
+            for (Face f : eMesh.mesh.getFaces()) {
                 if (f.isValid()){
                     writer.printf("f %d %d %d%n", f.getV1() + 1, f.getV2() + 1, f.getV3() + 1);
                 }

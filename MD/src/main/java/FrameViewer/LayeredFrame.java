@@ -183,6 +183,8 @@ public class LayeredFrame extends JLayeredPane {
                 for (int i = 0; i < steps; i++) {
                     qem.decimateOneStep();
                     publish();
+                        
+                    //Thread.sleep(1);
                 }
                 return null;
             }
