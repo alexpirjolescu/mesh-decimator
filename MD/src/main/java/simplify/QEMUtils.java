@@ -142,6 +142,10 @@ public class QEMUtils {
         }
     }
 
+    public int vertQuadricsSize(){ 
+        return vertexQuadrics.size();
+    }
+
     private void collapseEdge(EdgeCollapse collapse) { 
         Vertex v1 = collapse.v1;
         Vertex v2 = collapse.v2;
@@ -154,7 +158,8 @@ public class QEMUtils {
         v2.incrementVersion();
         v1.setAlive(false);
         v2.setAlive(false);
-
+        vertexQuadrics.remove(v1.getID());
+        vertexQuadrics.remove(v2.getID());
         // create union face list of v1 v2;
         int[] unionFaces = getUnion(v1, v2);
         

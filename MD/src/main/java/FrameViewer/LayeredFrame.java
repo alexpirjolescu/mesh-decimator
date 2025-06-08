@@ -9,6 +9,7 @@ import io.OBJMeshIO;
 
 import java.awt.*;
 import java.io.File;
+import java.util.List;
 
 import mesh.Mesh;
 import simplify.QEMUtils;
@@ -30,6 +31,9 @@ public class LayeredFrame extends JLayeredPane {
         private JSlider slider;
         // mesh frame
         private WireframeViewer meshPanel;
+        // vertex count label
+        private JLabel vertexCountLabel;
+
         // mesh
         private Mesh mesh;
 
@@ -54,13 +58,19 @@ public class LayeredFrame extends JLayeredPane {
 
         decimateButton = new JButton("Decimate");
         decimateButton.addActionListener(e ->{ 
+            int value = slider.getValue();
             System.out.println("Decimate button pressed!"); 
-            decimate1010Async();
+            decimateAsync(value);
         });
         add(decimateButton, Integer.valueOf(1));
 
         slider = new JSlider(0,100,50);
         add(slider,Integer.valueOf(1));
+
+        vertexCountLabel = new JLabel("Vertices: " + qem.vertQuadricsSize());
+        vertexCountLabel.setForeground(Color.WHITE);
+        vertexCountLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        add(vertexCountLabel, Integer.valueOf(1));
 
     }
         @Override
@@ -84,7 +94,9 @@ public class LayeredFrame extends JLayeredPane {
             int sliderWidth = (int)(width * 0.25);
             int sliderHeight = 40;
             slider.setBounds((int)(width * 0.05), (int)(height * 0.90) - sliderHeight, sliderWidth, sliderHeight);
-
+            int labelWidth = 200;
+            int labelHeight = 40;
+            vertexCountLabel.setBounds((int)(width*0.80), (int)(height*0.15) - labelHeight, labelWidth, labelHeight);
         }
 
     private void decimate100(){
@@ -113,14 +125,21 @@ public class LayeredFrame extends JLayeredPane {
         } 
     }
 
-    private void decimate100Async() {
+    private void decimateAsync(int value) {
+        int steps =(int)(qem.vertQuadricsSize() * value / 100) ;
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() throws Exception {
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < steps; i++) {
                     qem.decimateOneStep();
+                    publish();
                 }
                 return null;
+            }
+            @Override
+            protected void process(List<Void> chunks) {
+                meshPanel.repaint();
+                vertexCountLabel.setText("Vertices: " + qem.vertQuadricsSize());
             }
 
             @Override
@@ -136,7 +155,7 @@ public class LayeredFrame extends JLayeredPane {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() throws Exception {
-                for (int i = 0; i < 1010; i++) {
+                for (int i = 0; i < 20010; i++) {
                     qem.decimateOneStep();
                 }
                 return null;
