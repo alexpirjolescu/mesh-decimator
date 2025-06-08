@@ -68,9 +68,8 @@ public class Mesh {
 
     public void addEdge(Edge e) {
         if(!edgeSet.contains(e)) {
-            Edge edge = new Edge(edges.size(), e.v1, e.v2);
-            edgeSet.add(edge);
-            edges.add(edge);
+            edgeSet.add(e);
+            edges.add(e);
         }
     }
 
@@ -86,7 +85,7 @@ public class Mesh {
 
 
     private void addEdges(Face f) {
-        int[] verts = f.getVertices(); //returns ordered list
+        int[] verts = f.getVertices();
         
         int[][] edgePairs = {
             {verts[0], verts[1]},
@@ -106,28 +105,6 @@ public class Mesh {
         }
     }
     
-    public Vertex collapseEdge(Vertex v1, Vertex v2, vec3d vNewPos) {
-        //Create new vertex at position vNewPos with new ID
-        Vertex vNew = new Vertex(getVListSize(),vNewPos.getX() , vNewPos.getY(), vNewPos.getZ());
-        //Add vNew to vertex list
-        addVertex(vNew);
-        
-        //increment version of v1 and v2 to ensure edge validity
-        v1.incrementVersion();
-        v2.incrementVersion();
-        
-// combine qemutils with s. 
 
-        //for face where v1||v2 belongs to the face
-            // subtract quadric of v1||v2 from verts of the face
-        //create face list for vNew
-            // remove degenerate faces
-        // compute face quadrics
-        // add face quadrics to vertex quadrics
-        // update heap with new edges
-
-
-        return vNew;
-    }
     
 }

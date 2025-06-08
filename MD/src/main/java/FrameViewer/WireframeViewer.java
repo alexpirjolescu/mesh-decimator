@@ -4,6 +4,8 @@
  */
 package FrameViewer;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import mesh.*;
@@ -11,6 +13,7 @@ import mesh.*;
 import javax.swing.*;
 import java.util.*;
 import java.util.List;
+import javax.swing.Timer;
 
 /**
  *
@@ -19,9 +22,9 @@ import java.util.List;
 
 
 public class WireframeViewer extends JPanel{
-    List<Vertex> vertices = new ArrayList<>();
-    List<Face> faces = new ArrayList<>();
-    private double angle = 0;
+    private Mesh mesh;
+    private double angleY = 0;
+    private double angleX = 1.6;
     private double zoom =1.0;
     private double translateX = 0;
     private double translateY = 0;
@@ -29,16 +32,33 @@ public class WireframeViewer extends JPanel{
     
     public WireframeViewer(Mesh mesh)
     {
-        this.vertices = mesh.getVertices();
-        this.faces = mesh.getFaces();
+        this.mesh = mesh;
         
         // Rotate Mesh
-       /* Timer timer = new Timer(30, e->{
-            angle+=0.01;
-            repaint();
+        setFocusable(true);
+        requestFocusInWindow();
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_A) {
+                    angleY += 0.1;
+                    repaint();
+                }
+                else if (e.getKeyCode() == KeyEvent.VK_D) {
+                    angleY -= 0.1;
+                    repaint();
+                }
+                else if (e.getKeyCode() == KeyEvent.VK_W) {
+                    angleX += 0.1;
+                    repaint();
+                }
+                else if (e.getKeyCode() == KeyEvent.VK_S) {
+                    angleX -= 0.1;
+                    repaint();
+                }
+            }
         });
-        timer.start();
-        */
+
         // Zoom in/out
         addMouseWheelListener(e -> {
             double delta = 0.1f;
@@ -74,6 +94,11 @@ public class WireframeViewer extends JPanel{
         
         
     }
+    public void setMesh(Mesh mesh) {
+        this.mesh = mesh;
+        repaint();
+    }
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -95,14 +120,14 @@ public class WireframeViewer extends JPanel{
         
         
         //For each face draw lines between the 3 vertecies that define it
-        for (Face face : faces) {
+        for (Face face : mesh.getFaces()) {
             if (face.isValid()){
                 Vertex[] v ={
-                    vertices.get(face.getV1()),
-                    vertices.get(face.getV2()),
-                    vertices.get(face.getV3())
+                    mesh.getVertices().get(face.getV1()),
+                    mesh.getVertices().get(face.getV2()),
+                    mesh.getVertices().get(face.getV3())
                 };
-                
+                    
                 int [][] points = new int[3][2];
                 
                 for (int i=0; i<3; i++){
@@ -110,12 +135,12 @@ public class WireframeViewer extends JPanel{
                     double y = v[i].getY();
                     double z = v[i].getZ();
                     
-                    double xRot = x*  Math.cos(angle) - z *Math.sin(angle);
-                    double zRot = x* Math.sin(angle) - z*Math.cos(angle);
-                
+                    double xRot = x*  Math.cos(angleY) - z * Math.sin(angleY);
+                    double zRot = x * Math.sin(angleY) - z * Math.cos(angleY);
+                    double yRot = y * Math.sin(angleX) + z * Math.cos(angleX);
                     double scale = 24000 / (zRot+400);        //Perspective projection
                     int screenX = (int) (w / 2 + xRot * scale);
-                    int screenY = (int) (h /2 - y * scale);
+                    int screenY = (int) (h /2 - yRot * scale);
                     points[i][0] = screenX;
                     points[i][1] = screenY;
                 }

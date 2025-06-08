@@ -11,7 +11,7 @@ import mesh.*;
  */
 
  // General interface for 3D model loading & saving
-interface MeshIO {
+interface MeshIO {  
         Mesh load(File file) throws IOException, FileNotFoundException; // Function for loading the file
         void save (Mesh mesh, File file) throws IOException, FileNotFoundException; // Function for saving a file
  }
@@ -65,11 +65,14 @@ public class OBJMeshIO implements MeshIO {
     public void save(Mesh mesh, File file) throws IOException {
         try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
             for (Vertex v : mesh.getVertices()) {
-                writer.printf("v %.6f %.6f %.6f%n", v.getX(), v.getY(), v.getZ());
+                if (v.getVersion() == 0){
+                    writer.printf("v %.6f %.6f %.6f%n", v.getX(), v.getY(), v.getZ());
+                }
             }
             for (Face f : mesh.getFaces()) {
-                // Note: OBJ uses 1-based indexing
-                writer.printf("f %d %d %d%n", f.getV1() + 1, f.getV2() + 1, f.getV3() + 1);
+                if (f.isValid()){
+                    writer.printf("f %d %d %d%n", f.getV1() + 1, f.getV2() + 1, f.getV3() + 1);
+                }
             }
         } catch(Exception e){
             throw new IOException("Failed to write to file.");

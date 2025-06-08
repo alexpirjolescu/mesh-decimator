@@ -4,6 +4,7 @@
  */
 package FrameViewer;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import io.OBJMeshIO;
 
@@ -19,6 +20,8 @@ import simplify.QEMUtils;
  */
 public class LayeredFrame extends JLayeredPane {
     //layer all the needed frames 
+        // 
+        private File currentFile;
         // frame
         private JFrame frame;
         // load button 
@@ -27,6 +30,8 @@ public class LayeredFrame extends JLayeredPane {
         private JButton exportButton;
         //decimate button 
         private JButton decimateButton;
+        //reset button
+        private JButton reloadButton;
         // slider
         private JSlider slider;
         // mesh frame
@@ -39,17 +44,22 @@ public class LayeredFrame extends JLayeredPane {
 
         private QEMUtils qem;
 
+        private OBJMeshIO objMeshIO;
 
-    public LayeredFrame(Mesh mesh, JFrame frame){
+
+    public LayeredFrame(JFrame frame, File file){
         setLayout(null);
         setPreferredSize(new Dimension(800, 600));
         this.frame = frame;
-        this.mesh = mesh;
-        this.qem = new QEMUtils(this.mesh);
+        this.currentFile=file;
+        objMeshIO = new OBJMeshIO();
+
+        loadMesh();
         meshPanel = new WireframeViewer(qem.mesh);
         add(meshPanel, Integer.valueOf(0));
     
         loadButton = new JButton("Load");
+        loadButton.addActionListener(e -> loadOBJ());
         add(loadButton, Integer.valueOf(1));
     
         exportButton = new JButton("Export");
@@ -61,8 +71,16 @@ public class LayeredFrame extends JLayeredPane {
             int value = slider.getValue();
             System.out.println("Decimate button pressed!"); 
             decimateAsync(value);
+            meshPanel.requestFocusInWindow();
         });
         add(decimateButton, Integer.valueOf(1));
+
+        reloadButton = new JButton("Reload");
+        reloadButton.addActionListener(e -> {
+            loadMesh();
+            loadMeshPanel(qem.mesh);
+        });
+        add(reloadButton, Integer.valueOf(1));
 
         slider = new JSlider(0,100,50);
         add(slider,Integer.valueOf(1));
@@ -71,6 +89,8 @@ public class LayeredFrame extends JLayeredPane {
         vertexCountLabel.setForeground(Color.WHITE);
         vertexCountLabel.setFont(new Font("Arial", Font.BOLD, 14));
         add(vertexCountLabel, Integer.valueOf(1));
+
+        
 
     }
         @Override
@@ -89,9 +109,14 @@ public class LayeredFrame extends JLayeredPane {
             //Export button 15% width 5% height
             exportButton.setBounds((int)(width*0.15), (int)(height*0.05), btnWidth, btnHeight);
 
+            //Decimate button at 80% width 5% height
             decimateButton.setBounds((int)(width*0.80), (int)(height *0.05), 2*btnWidth, btnHeight);
+            
+            //Reload button 5% width 10% height
+            reloadButton.setBounds((int)(width*0.05), (int)(height*0.10), btnWidth, btnHeight);
+            
             //Slider at 5% width 90% height
-            int sliderWidth = (int)(width * 0.25);
+           int sliderWidth = (int)(width * 0.25);
             int sliderHeight = 40;
             slider.setBounds((int)(width * 0.05), (int)(height * 0.90) - sliderHeight, sliderWidth, sliderHeight);
             int labelWidth = 200;
@@ -99,15 +124,8 @@ public class LayeredFrame extends JLayeredPane {
             vertexCountLabel.setBounds((int)(width*0.80), (int)(height*0.15) - labelHeight, labelWidth, labelHeight);
         }
 
-    private void decimate100(){
-        int i = 0;
-        while(i < 100) {
-            qem.decimateOneStep();
-            i++;
-            meshPanel.repaint();
-        }
         
-    }
+    
 
     private void exportOBJ() {
         JFileChooser chooser = new JFileChooser();
@@ -116,13 +134,45 @@ public class LayeredFrame extends JLayeredPane {
             File saveFile = chooser.getSelectedFile();
             try {
                 OBJMeshIO objIO = new OBJMeshIO();
-                objIO.save(mesh, saveFile);
+                objIO.save(qem.mesh, saveFile);
                 JOptionPane.showMessageDialog(frame, "OBJ exported.");
+                meshPanel.requestFocusInWindow();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(frame, "Failed to export OBJ.");
             }
         } 
+    }
+
+    private void loadOBJ() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Load OBJ File");
+        chooser.setFileFilter(new FileNameExtensionFilter("OBJ Files", "obj"));
+        if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+            File loadFile = chooser.getSelectedFile();
+            currentFile = loadFile;
+            loadMesh();
+            loadMeshPanel(qem.mesh);
+        }
+    }
+
+    private void loadMesh() {
+        try { 
+            mesh = new Mesh(objMeshIO.load(currentFile));
+            qem = new QEMUtils(mesh);
+            System.out.println("Loaded mesh with " + mesh.getVertices().size() + " vertices.");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Failed to load OBJ");
+        }
+        
+    }
+
+    private void loadMeshPanel(Mesh mesh) {
+        meshPanel.setMesh(mesh);
+        meshPanel.requestFocusInWindow();
+        meshPanel.repaint();
+        vertexCountLabel.setText("Vertices: " + qem.vertQuadricsSize());
     }
 
     private void decimateAsync(int value) {
@@ -150,12 +200,16 @@ public class LayeredFrame extends JLayeredPane {
         };
         worker.execute();  // Starts the background thread
 }
-    
-    private void decimate1010Async() {
+
+
+//          Silent Decimation (process not dislayed on UI)
+
+        private void decimateSilent(int value) {
+        int steps =(int)(qem.vertQuadricsSize() * value / 100) ;
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() throws Exception {
-                for (int i = 0; i < 20010; i++) {
+                for (int i = 0; i < steps; i++) {
                     qem.decimateOneStep();
                 }
                 return null;
@@ -165,6 +219,7 @@ public class LayeredFrame extends JLayeredPane {
             protected void done() {
                 // Runs on EDT after doInBackground finishes
                 meshPanel.repaint();
+                vertexCountLabel.setText("Vertices: " + qem.vertQuadricsSize());
             }
         };
         worker.execute();  // Starts the background thread

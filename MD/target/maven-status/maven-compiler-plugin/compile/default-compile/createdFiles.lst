@@ -1,13 +1,13 @@
 io\STLMeshIO.class
+mesh\Edge.class
+FrameViewer\WireframeViewer$1.class
+io\OBJMeshIO.class
+FrameViewer\WireframeViewer.class
 mesh\Face.class
 mesh\Mesh.class
 io\MeshIO.class
-mesh\Edge.class
 simplify\MeshSimplifier.class
 simplify\QEMUtils.class
 com\mycompany\md\MD.class
-FrameViewer\WireframeViewer$1.class
-io\OBJMeshIO.class
 mesh\Vertex.class
-FrameViewer\WireframeViewer.class
 simplify\Quadric.class

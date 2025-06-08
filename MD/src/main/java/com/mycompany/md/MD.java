@@ -22,14 +22,11 @@ public class MD {
             throw new RuntimeException("Mesh.obj not found in resources");
         
         File file = new File(resourceUrl.toURI());
-        OBJMeshIO loader = new OBJMeshIO();
-        Mesh mesh = loader.load(file);
-        System.out.println("Loaded mesh with " + mesh.getVertices().size() + " vertices.");
-        
-        JFrame frame = new JFrame("Wireframe Viewer");
+            
+        JFrame frame = new JFrame("Mesh Viewer");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800,600);
-        frame.add(new LayeredFrame(mesh, frame));
+        frame.add(new LayeredFrame(frame, file));
         frame.setVisible(true);
     }
 }
