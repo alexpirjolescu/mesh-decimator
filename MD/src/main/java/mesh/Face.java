@@ -15,6 +15,13 @@ public class Face {
     private int v1, v2, v3;
     private boolean valid = true;
     private int id;
+
+    public Face(Face other) {
+        this.v1 = other.getV1();
+        this.v2 = other.getV2();
+        this.v3 = other.getV3();
+        this.id = other.getId();
+    }
     
     public Face(int id, int v1, int v2, int v3)
     {
@@ -55,6 +62,8 @@ public class Face {
     }
 
     public boolean isValid() {
+        boolean v = this.isDegenerate();
+        valid = v;
         return valid;
     }
 

@@ -5,27 +5,40 @@ package mesh;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 import java.util.*;
+import java.util.stream.Collectors;
 /**
  *
  * @author alexp
  */
 public class Mesh {
-    private List<Vertex> vertices= new ArrayList<>();
-    private List<Face> faces = new ArrayList<>();
-    private List<Edge> edges = new ArrayList<>();
-    private Set<Edge> edgeSet = new HashSet<>(); 
+    private List<Vertex> vertices;
+    private List<Face> faces;
+    private List<Edge> edges;
+    private Set<Edge> edgeSet;
 
     //private record edges(int v1, int v2){}
     //private Map <edges, Integer> edgesMap = new HashMap<>();
     public Mesh() {
-
+        this.vertices= new ArrayList<>();
+        this.faces = new ArrayList<>();
+        this.edges = new ArrayList<>();
+        this.edgeSet = new HashSet<>();
     }
 
     public Mesh(Mesh mesh) {
-        this.vertices = mesh.getVertices();
-        this.faces = mesh.getFaces();
-        this.edges = mesh.getEdges();
-        this.edgeSet = mesh.getEdgeSet();
+        this.vertices = mesh.getVertices().stream()
+            .map(Vertex::new)
+            .collect(Collectors.toList());
+            
+        this.faces = mesh.getFaces().stream()
+            .map(Face::new)
+            .collect(Collectors.toList());
+            
+        this.edges = mesh.getEdges().stream()
+            .map(Edge::new)
+            .collect(Collectors.toList());
+            
+        this.edgeSet = new HashSet<>(this.edges);
     }
     
     

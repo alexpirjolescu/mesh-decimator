@@ -20,7 +20,7 @@ public class exportMesh {
     private Map<Integer, Integer> idMap= new HashMap<>();
 
     public exportMesh(Mesh mesh) {
-        this.mesh = mesh;
+        this.mesh = new Mesh(mesh);
         prepareMesh();
     }
 

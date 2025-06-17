@@ -6,11 +6,16 @@ package FrameViewer;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+
 import io.OBJMeshIO;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+import java.net.URL;
 
 import mesh.Mesh;
 import simplify.QEMUtils;
@@ -18,11 +23,17 @@ import simplify.QEMUtils;
  *
  * @author alexp
  */
-public class LayeredFrame extends JLayeredPane {
-    //layer all the needed frames 
-        // 
+public class DecimatorUI extends JLayeredPane {
+    //layer all the needed frames
+        // input stream
+        private InputStream inputStream;
+        // file
         private File currentFile;
-        // frame
+        // export file
+        private File outFile;
+        // decimate percentage
+        private int percentage = 0;
+        //frame 
         private JFrame frame;
         // load button 
         private JButton loadButton;
@@ -35,7 +46,7 @@ public class LayeredFrame extends JLayeredPane {
         // slider
         private JSlider slider;
         // mesh frame
-        private WireframeViewer meshPanel;
+        private OrbitViewer meshPanel;
         // vertex count label
         private JLabel vertexCountLabel;
 
@@ -47,25 +58,64 @@ public class LayeredFrame extends JLayeredPane {
         private OBJMeshIO objMeshIO;
 
 
-    public LayeredFrame(JFrame frame, File file){
+
+    public DecimatorUI(JFrame frame, File file, Integer percentageInt, File outFile){
         setLayout(null);
         setPreferredSize(new Dimension(800, 600));
         this.frame = frame;
         this.currentFile=file;
-        objMeshIO = new OBJMeshIO();
+        this.outFile = outFile;
+        this.percentage = percentageInt;
 
+        if (this.currentFile == null) {
+            try {
+                // Get resource as URL
+                URL resourceUrl = getClass().getResource("/HumanMesh.obj");
+                if (resourceUrl == null) {
+                    throw new RuntimeException("Default mesh resource not found");
+                }
+                
+                // Handle both JAR and filesystem cases
+                if (resourceUrl.getProtocol().equals("jar")) {
+                    // When running from JAR
+                    this.inputStream = getClass().getResourceAsStream("/HumanMesh.obj");
+                    this.currentFile = inputStreamToTempFile(this.inputStream, "human", "obj");
+                } else {
+                    // When running in IDE
+                    this.currentFile = new File(resourceUrl.toURI());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(frame, "Failed to load default mesh");
+                return;
+            }
+        }
+        else {
+            System.out.println("Loaded file: " + currentFile.getAbsolutePath());
+        }
+
+        
+        // create OBJMeshIO object
+        objMeshIO = new OBJMeshIO();
+        
+        // load mesh from currentFile to mesh and eqm
         loadMesh();
-        meshPanel = new WireframeViewer(qem.mesh);
-        add(meshPanel, Integer.valueOf(0));
-    
+
+        
+        
+        // set up meshPanel with new orbit viewer   (can also use WireframeViewer)
+        meshPanel = new OrbitViewer(qem.mesh);
+        
+
+        // set up load button
         loadButton = new JButton("Load");
         loadButton.addActionListener(e -> loadOBJ());
-        add(loadButton, Integer.valueOf(1));
-    
+        
+        // set up export button
         exportButton = new JButton("Export");
         exportButton.addActionListener(e -> exportOBJ());
-        add(exportButton, Integer.valueOf(2));
-
+        
+        //set up decimate button
         decimateButton = new JButton("Decimate");
         decimateButton.addActionListener(e ->{ 
             int value = slider.getValue();
@@ -73,27 +123,42 @@ public class LayeredFrame extends JLayeredPane {
             decimateAsync(value);
             meshPanel.requestFocusInWindow();
         });
-        add(decimateButton, Integer.valueOf(1));
-
+        
+        //set up reload button
         reloadButton = new JButton("Reload");
         reloadButton.addActionListener(e -> {
             loadMesh();
             loadMeshPanel(qem.mesh);
         });
-        add(reloadButton, Integer.valueOf(1));
-
+        
+        //set up slider
         slider = new JSlider(0,100,50);
-        add(slider,Integer.valueOf(1));
-
+        
+        //set up vertecies label
         vertexCountLabel = new JLabel("Vertices: " + qem.vertQuadricsSize());
         vertexCountLabel.setForeground(Color.WHITE);
         vertexCountLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        
+        add(meshPanel, Integer.valueOf(0));
+        add(loadButton, Integer.valueOf(1));
+        add(exportButton, Integer.valueOf(1));
+        add(decimateButton, Integer.valueOf(1));
+        add(reloadButton, Integer.valueOf(1));
+        add(slider,Integer.valueOf(1));
         add(vertexCountLabel, Integer.valueOf(1));
 
-        
+
+        if (percentage != 0) {
+           SwingUtilities.invokeLater(() -> {
+            decimateSilent(percentage);
+            System.out.println("decimated: " + percentage);
+        });
+}
 
     }
-        @Override
+       
+    
+    @Override
         public void doLayout(){
             int width = getWidth();
             int height = getHeight();
@@ -128,20 +193,29 @@ public class LayeredFrame extends JLayeredPane {
     
 
     private void exportOBJ() {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setDialogTitle("Save OBJ File");
-        if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
-            File saveFile = chooser.getSelectedFile();
-            try {
-                OBJMeshIO objIO = new OBJMeshIO();
-                objIO.save(qem.mesh, saveFile);
-                JOptionPane.showMessageDialog(frame, "OBJ exported.");
-                meshPanel.requestFocusInWindow();
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(frame, "Failed to export OBJ.");
-            }
-        } 
+        if (outFile != null) {
+            saveExportOBJ(qem.mesh, outFile);
+        }
+        else {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setDialogTitle("Save OBJ File");
+            if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+                File saveFile = chooser.getSelectedFile();
+                outFile = saveFile;
+                saveExportOBJ(qem.mesh, saveFile);
+            } 
+        }
+    }
+
+    private void saveExportOBJ(Mesh mesh , File outFile) {
+        try {
+            objMeshIO.save(qem.mesh, outFile);
+            JOptionPane.showMessageDialog(frame, "OBJ exported.");
+            meshPanel.requestFocusInWindow();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "Failed to export OBJ.");
+        }   
     }
 
     private void loadOBJ() {
@@ -206,13 +280,16 @@ public class LayeredFrame extends JLayeredPane {
 
 //          Silent Decimation (process not dislayed on UI)
 
-        private void decimateSilent(int value) {
+    private void decimateSilent(int value) {
+        System.out.println("Silent decimation");
         int steps =(int)(qem.vertQuadricsSize() * value / 100) ;
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
             protected Void doInBackground() throws Exception {
                 for (int i = 0; i < steps; i++) {
+                    int before = qem.vertQuadricsSize();
                     qem.decimateOneStep();
+                    System.out.println("Step done. Before: " + before + " After: " + qem.vertQuadricsSize());
                 }
                 return null;
             }
@@ -220,11 +297,29 @@ public class LayeredFrame extends JLayeredPane {
             @Override
             protected void done() {
                 // Runs on EDT after doInBackground finishes
+                System.out.println("done: " + qem.vertQuadricsSize());
                 meshPanel.repaint();
                 vertexCountLabel.setText("Vertices: " + qem.vertQuadricsSize());
             }
         };
         worker.execute();  // Starts the background thread
 }
+
+    public File inputStreamToTempFile(InputStream inputStream, String prefix, String suffix) throws IOException {
+    // Create a temp file (auto-deleted on JVM exit)
+        File tempFile = File.createTempFile(prefix, suffix);
+        tempFile.deleteOnExit();
+
+        try (FileOutputStream out = new FileOutputStream(tempFile)) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                out.write(buffer, 0, bytesRead);
+            }
+        }
+
+        return tempFile;
+    }
+
 }
 

@@ -13,6 +13,7 @@ import mesh.*;
  // General interface for 3D model loading & saving
 interface MeshIO {  
         Mesh load(File file) throws IOException, FileNotFoundException; // Function for loading the file
+        Mesh loadIS(InputStream inputStream) throws IOException;
         void save (Mesh mesh, File file) throws IOException, FileNotFoundException; // Function for saving a file
  }
 
@@ -59,6 +60,37 @@ public class OBJMeshIO implements MeshIO {
     private int parseIndex(String part) {
         // Handles cases like "f 1", "f 1/1", or "f 1/1/1"
         return Integer.parseInt(part.split("/")[0]) - 1;
+    }
+    @Override
+    public Mesh loadIS(InputStream inputStream) {
+        Mesh mesh = new Mesh();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) { // Creates reader for obj file
+                String line;
+                while ((line = reader.readLine()) != null) { // While the next line isnt null
+                    line = line.trim(); // Strip the line
+                    if (line.startsWith("v ")) { // If the line is identified as a vertex
+                        String[] parts = line.split("\\s+"); // Split the string line into components
+                        float x = Float.parseFloat(parts[1]); // Grab x
+                        float y = Float.parseFloat(parts[2]); // Grab y
+                        float z = Float.parseFloat(parts[3]); // Grab z
+                        mesh.addVertex(new Vertex(mesh.getVListSize(), x, y, z)); // Add vertex with extracted x/y/z to the mesh object
+                    } else if (line.startsWith("f ")) { // If the line is identified as a face
+                        String[] parts = line.split("\\s+"); // Split the string line into components
+                        int[] vals = new int[parts.length-1]; // allocate space for the vertex IDs
+                        for(int i=0; i<vals.length; i++){ // parse all vertex IDs
+                            vals[i] = parseIndex(parts[i+1]);
+                        }
+                        int anchor = vals[0]; // use first vertex as the anchor
+                        for(int i=0; i<vals.length-2; i++){ // for all vertex pairs that dont include the anchor
+                            mesh.addFace(new Face(mesh.sizeFList(), anchor, vals[i+1], vals[i+2])); //Add triangular face using anchor and the next pair
+                        }
+                    }
+                }
+            } catch(Exception e) { 
+                System.err.println("Failed to read from InputStream: " + e.getMessage()); // If something goes wrong with reading the file but the file exists throws IOException
+                e.printStackTrace();
+            }
+        return mesh;
     }
 
     @Override

@@ -6,8 +6,6 @@ FrameViewer\WireframeViewer.class
 mesh\Face.class
 mesh\Mesh.class
 io\MeshIO.class
-simplify\MeshSimplifier.class
 simplify\QEMUtils.class
-com\mycompany\md\MD.class
 mesh\Vertex.class
 simplify\Quadric.class

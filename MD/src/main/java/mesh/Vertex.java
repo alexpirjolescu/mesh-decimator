@@ -20,6 +20,13 @@ public class Vertex extends vec3d{
     private int id;
     private int version;
     private boolean alive = true;
+
+    public Vertex(Vertex other) {
+        super(other.getX(), other.getY(), other.getZ());
+        this.id = other.getID();
+        this.version = other.getVersion();
+        this.alive = other.isAlive();
+    }
     
     public Vertex(int id, double x, double y, double z)
     {

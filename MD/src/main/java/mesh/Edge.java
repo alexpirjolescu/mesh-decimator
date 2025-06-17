@@ -13,6 +13,12 @@ import java.util.Objects;
 public class Edge {
     public int v1, v2;
     public int id;
+
+    public Edge(Edge other) {
+        this.v1 = other.v1;
+        this.v2 = other.v2;
+        this.id = other.id;
+    }
     
     public Edge(int id, int v1, int v2)
     {
