@@ -43,14 +43,19 @@ public class exportMesh {
         // 
     }
     private void remapFace(Face face) {
+        // map all three vertices at once, so a new id can't be
+        // mistaken for an old id that still has to be remapped
         int[] verts = face.getVertices();
-        for (int v : verts) {
-            if(idMap.containsKey(v)) {
-                face.replaceVertex(v, idMap.get(v));
+        int[] mapped = new int[3];
+        for (int i = 0; i < 3; i++) {
+            Integer newId = idMap.get(verts[i]);
+            if (newId == null) {
+                System.out.println("Error: exportMesh.remapFace: v not in idMap:" + verts[i]);
+                face.setValid(false);
+                return;
             }
-            else {
-                System.out.println("Error: exportMesh.remapFace: v not in idMap:" + v);
-            }
+            mapped[i] = newId;
         }
+        face.setVertices(mapped[0], mapped[1], mapped[2]);
     }
 }

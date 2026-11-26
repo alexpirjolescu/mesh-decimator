@@ -62,9 +62,17 @@ public class Face {
     }
 
     public boolean isValid() {
-        boolean v = this.isDegenerate();
-        valid = v;
+        // a face that collapsed to a line or point is no longer valid
+        if (this.isDegenerate()) {
+            valid = false;
+        }
         return valid;
+    }
+
+    public void setVertices(int v1, int v2, int v3) {
+        this.v1 = v1;
+        this.v2 = v2;
+        this.v3 = v3;
     }
 
     public void setValid(boolean status) {
